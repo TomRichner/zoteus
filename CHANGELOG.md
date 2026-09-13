@@ -4,6 +4,14 @@ All notable changes to Zoteus are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- `.md` and `.markdown` files are stored as `text/markdown`. A Markdown conversion of a
+  paper attached beside its PDF with `zotero_attach_file` was landing as
+  `application/octet-stream` unless `content_type` was spelled out, since the inferred
+  table knew `.txt` but not Markdown.
+
 ## [1.20.0] - 2026-09-12
 
 ### Changed

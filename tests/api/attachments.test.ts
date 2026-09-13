@@ -25,6 +25,9 @@ function fakeWeb(overrides: any = {}) {
 describe('attachments', () => {
   it('guessContentType maps extensions', () => {
     expect(guessContentType('paper.pdf')).toBe('application/pdf');
+    // A Markdown conversion stored beside a PDF was landing as application/octet-stream.
+    expect(guessContentType('paper_ocr.md')).toBe('text/markdown');
+    expect(guessContentType('notes.MARKDOWN')).toBe('text/markdown');
     expect(guessContentType('weird.xyz')).toBe('application/octet-stream');
   });
 

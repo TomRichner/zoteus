@@ -6,6 +6,8 @@ import type { WebApiClient, LibraryRef } from './web-client.js';
 const CONTENT_TYPES: Record<string, string> = {
   '.pdf': 'application/pdf',
   '.txt': 'text/plain',
+  '.md': 'text/markdown',
+  '.markdown': 'text/markdown',
   '.html': 'text/html',
   '.htm': 'text/html',
   '.json': 'application/json',

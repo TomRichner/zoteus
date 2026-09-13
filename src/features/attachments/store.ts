@@ -28,6 +28,7 @@ const EXTENSION_BY_TYPE: Record<string, string> = {
   'application/pdf': '.pdf',
   'text/html': '.html',
   'application/epub+zip': '.epub',
+  'text/markdown': '.md',
 };
 
 /**
