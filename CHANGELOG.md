@@ -7,6 +7,14 @@ All notable changes to Zoteus are documented here. The format is based on
 ## [Unreleased]
 
 ### Added
+- **`zotero_attachment action:"info"` returns where the file is on this machine:** `localPath`
+  and `localPathExists`, and `item_key` may name a parent item, which resolves to its best
+  readable attachment. The path was always computable (the readers open
+  `<ZOTERO_DATA_DIR>/storage/<key>/<filename>` themselves when the desktop app is not
+  running) but never returned, so a pipeline that hands a PDF to another program had to
+  rebuild it from two fields of the record. Linked files report their recorded path, or a
+  note when it is relative to Zotero's base directory. A remote caller gets no path, by the
+  same rule `caller-path.ts` applies to paths coming in.
 - `.md` and `.markdown` files are stored as `text/markdown`. A Markdown conversion of a
   paper attached beside its PDF with `zotero_attach_file` was landing as
   `application/octet-stream` unless `content_type` was spelled out, since the inferred

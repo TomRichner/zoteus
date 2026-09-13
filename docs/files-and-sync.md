@@ -30,7 +30,7 @@ The version-based delta the Zotero sync algorithm uses. Given `since` (a library
 Upload, download, or inspect attachment files. File bytes go to/from **disk**, never through the conversation.
 - `upload` — store a file via the full 5-step Zotero File Storage protocol (compute md5/mtime → request authorization → upload bytes → register). Give `url` to have Zoteus fetch the file itself, or `file_path` for a file on the machine running Zoteus. Optional `parent_item`, `title`, `content_type`. Returns the new attachment key (and whether the file already existed in storage).
 - `download` — fetch an attachment's file to `save_path` (default under the Zoteus data dir); returns the path and byte count. A `save_path` you name will not silently replace a file that is already there: pass `overwrite: true` if that is what you want. The default location is exempt, being Zoteus's own cache for that attachment key.
-- `info` — return an attachment item's metadata.
+- `info` — return an attachment item's metadata, plus `localPath`: the file's absolute path on the machine running Zoteus (`<ZOTERO_DATA_DIR>/storage/<key>/<filename>` for a stored file, the recorded path for a linked one) and `localPathExists`. That is the path to hand to another program, an OCR tool say, that takes a file rather than text. `item_key` may also be a **parent** item key, which resolves to its best readable attachment (a PDF first, then an EPUB). A remote caller gets no path: on a shared deployment it would name the operator's disk.
 
 > Uploads/downloads use the cloud Web API and count against your Zotero file-storage quota. For a **key-free** store into the running desktop app, use `zotero_attach_file` instead.
 >

@@ -9,6 +9,8 @@ import { libraryArgs } from './common-args.js';
 import { ok, optionalLibrary, requireCloudLibrary } from '../registry/registry.js';
 import { uploadFile, downloadFile } from '../api/attachments.js';
 import { AttachmentDownloadError, readAttachmentSource, storeCloudAttachment } from '../features/attachments/store.js';
+import { resolveAttachment } from '../features/attachments/resolve.js';
+import { localAttachmentPath } from '../features/attachments/local-path.js';
 
 function err(text: string): ToolHandlerResult {
   return { content: [{ type: 'text', text }], isError: true };
@@ -18,7 +20,7 @@ const attachment: ToolDefinition = {
   name: 'zotero_attachment',
   title: 'Zotero attachments (files)',
   description:
-    "Upload, download, or inspect attachment files. `action`: \"upload\" stores a file as a Zotero attachment using the full File Storage protocol (provide `url` to have Zoteus fetch it, or `file_path` for a file on the machine running Zoteus; optional `parent_item` to attach it under an item, `title`, `content_type`) and returns the new attachment key; \"download\" fetches an attachment's file to a local path (provide `item_key`; optional `save_path`, default under the Zoteus data dir) and returns the path and byte count; \"info\" returns an attachment item's metadata. File bytes are written to / read from disk, never streamed through the conversation. Upload/download use the cloud Web API and your file-storage quota. When Zoteus runs on a different machine than Zotero, `file_path` refers to the server's disk, so use `url` instead.",
+    "Upload, download, or inspect attachment files. `action`: \"upload\" stores a file as a Zotero attachment using the full File Storage protocol (provide `url` to have Zoteus fetch it, or `file_path` for a file on the machine running Zoteus; optional `parent_item` to attach it under an item, `title`, `content_type`) and returns the new attachment key; \"download\" fetches an attachment's file to a local path (provide `item_key`; optional `save_path`, default under the Zoteus data dir) and returns the path and byte count; \"info\" returns an attachment item's metadata together with `localPath`, the file's absolute path on the machine running Zoteus, for handing the file to another program (an OCR tool, a viewer); `item_key` may name the attachment itself or a parent item, in which case its best readable attachment (PDF first) is described. File bytes are written to / read from disk, never streamed through the conversation. Upload/download use the cloud Web API and your file-storage quota. When Zoteus runs on a different machine than Zotero, `file_path` refers to the server's disk, so use `url` instead.",
   inputSchema: {
     action: z
       .enum(['upload', 'download', 'info'])
@@ -30,7 +32,7 @@ const attachment: ToolDefinition = {
     parent_item: z.string().optional().describe('Parent item key to attach under (upload).'),
     title: z.string().optional().describe('Attachment title (upload), e.g. "Full Text PDF"; the filename is used when omitted.'),
     content_type: z.string().optional().describe('MIME type of the uploaded file, e.g. "application/pdf"; inferred from the filename when omitted.'),
-    item_key: z.string().optional().describe('Attachment item key (download/info).'),
+    item_key: z.string().optional().describe('Attachment item key (download/info). For info, a parent item key is accepted too and resolves to its best readable attachment.'),
     save_path: z.string().optional().describe('Where to write the downloaded file.'),
     overwrite: z
       .boolean()
@@ -41,6 +43,9 @@ const attachment: ToolDefinition = {
   outputSchema: z
     .object({
       attachment: zoteroObject.optional().describe("action:\"info\": the attachment item's full record."),
+      localPath: z.string().optional().describe('action:"info": absolute path of the file on the machine running Zoteus (stored files live under <ZOTERO_DATA_DIR>/storage/<key>/). Absent on a remote deployment.'),
+      localPathExists: z.boolean().optional().describe('action:"info": whether that file is present on disk right now.'),
+      localPathNote: z.string().optional().describe('action:"info": why no usable local path could be given.'),
       key: z.string().optional().describe('action:"upload": key of the attachment item created.'),
       exists: z.boolean().optional().describe('True when Zotero already held these bytes and only the item was created.'),
       filename: z.string().optional().describe('File name stored.'),
@@ -94,8 +99,26 @@ const attachment: ToolDefinition = {
     if (args.action === 'info') {
       if (!args.item_key) return err('`item_key` is required for info.');
       const library = optionalLibrary(args);
-      const item = await ctx.router.getItem(args.item_key, { library });
-      return ok({ attachment: item }, `Attachment ${args.item_key}: ${item?.data?.filename ?? item?.data?.title ?? '(unnamed)'}.`);
+      let item = await ctx.router.getItem(args.item_key, { library });
+      let via = '';
+      // A parent key is the key a caller usually has (it is what search returns); the
+      // attachment key is one hop further, so take that hop here rather than making every
+      // caller do it.
+      if ((item?.data?.itemType ?? item?.itemType) !== 'attachment') {
+        const resolved = await resolveAttachment(ctx, args.item_key, library);
+        if ('error' in resolved) return err(resolved.error);
+        item = await ctx.router.getItem(resolved.attachmentKey, { library });
+        via = ` (best readable attachment of item ${args.item_key})`;
+      }
+      const local = localAttachmentPath(ctx, item);
+      const key = item?.key ?? args.item_key;
+      const name = item?.data?.filename ?? item?.data?.title ?? '(unnamed)';
+      const where = local.localPath
+        ? ` at ${local.localPath}${local.localPathExists ? '' : ' (missing on disk)'}`
+        : local.localPathNote
+          ? `; no local path: ${local.localPathNote}`
+          : '';
+      return ok({ attachment: item, ...local }, `Attachment ${key}: ${name}${via}${where}.`);
     }
 
     const lib = requireCloudLibrary(ctx, args);
