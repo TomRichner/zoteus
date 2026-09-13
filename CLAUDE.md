@@ -6,6 +6,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Zoteus is an MCP server (TypeScript, Node >= 20.19, NodeNext ESM) that exposes a Zotero library to Claude, ChatGPT and other MCP clients as 32 `zotero_*` tools. Published to npm as `@oscardvs/zoteus`; `dist/index.js` is the `zoteus` binary.
 
+## This is a fork
+
+This checkout (`TomRichner/zoteus`) is a fork of `oscardvs/zoteus` kept as "upstream plus our
+commits" and consumed by the private dotfile repo's installer, which clones it over HTTPS
+into `~/Desktop/local_code/dotfile_installed/zoteus` and builds it when HEAD changes. Our
+commits on top of upstream are:
+
+- `feat(attachments): store .md files as text/markdown` — `src/api/attachments.ts`,
+  `src/features/attachments/store.ts`.
+- `feat(attachment): report the file's local path from action info` —
+  `src/features/attachments/local-path.ts`, `src/tools/attachment.ts`,
+  `tests/tools/attachment-info.test.ts`.
+- `feat(tools): zotero_citekeys resolves Better BibTeX keys both ways` —
+  `src/tools/citekeys.ts`, `tests/tools/citekeys.test.ts`, the tool-count assertions (32) in
+  `tests/integration/server.test.ts`, `tests/registry/strict-args.test.ts` and
+  `tests/tools/schema-metadata.test.ts`, `codex/zotero/citekeys.ts`, README/CHANGELOG/docs.
+- `docs: add CLAUDE.md` — this file.
+
+Remotes: `origin` is the fork (fetch over HTTPS, push rewritten to SSH by the user's git
+config), `upstream` is `oscardvs/zoteus`. To take upstream changes: `git fetch upstream &&
+git rebase upstream/main`, run the full CI gate below, `git push --force-with-lease`, then
+re-run the dotfile installer so `dist/` is rebuilt. **Rebase, never merge**, so the fork
+stays readable as a short patch series. Conflicts land in the files listed above; the
+tool-count assertions move every time upstream adds a tool. Do not push to `upstream`.
+Changes worth everyone having should go upstream as pull requests from a branch, one per
+patch, so the series here can shrink.
+
 ## Commands
 
 ```bash
