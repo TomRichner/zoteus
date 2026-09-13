@@ -44,6 +44,7 @@ These files are generated from the tool registry — regenerate with `npm run ge
 | `savedSearches()` | `zotero_saved_searches` | Manage Zotero saved searches |
 | `groups()` | `zotero_groups` | List Zotero groups |
 | `exportTool()` | `zotero_export` | Export Zotero items |
+| `citekeys()` | `zotero_citekeys` | Resolve Better BibTeX citation keys |
 | `fulltext()` | `zotero_fulltext` | Attachment full-text |
 | `getFulltext()` | `zotero_get_fulltext` | Get attachment full text / passages / outline (read-only) |
 | `pdfImages()` | `zotero_pdf_images` | Look at PDF pages and figures as images (read-only) |

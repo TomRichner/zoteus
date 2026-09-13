@@ -16,6 +16,9 @@ docker run -d -p 1969:1969 zotero/translation-server
 # then (optional) set ZOTEUS_TRANSLATION_SERVER_URL if not on the default port
 ```
 
+## `zotero_citekeys` — Better BibTeX keys, both directions
+For a manuscript that cites with `[@key]`. `citekeys` reports, for each key, whether an item carries exactly that citation key and which item it is, with the item's attachments and their local file paths (`include_attachments`, default true), so a PDF can be handed to another program by citekey; keys that are absent come back with `found: false` and in `missing`, never guessed. `item_keys` returns each item's citation key, for adding a citation. Keys are matched exactly and case-sensitively against the item's `citationKey` field, which the Better BibTeX plugin fills in (with the older `Citation Key:` line in `extra` accepted too); without the plugin every key reports as absent. The lookups follow the ordinary library read route, so the desktop app answers them key-free. For BBT's formatted BibLaTeX entries use `zotero_export format:"better-biblatex"`.
+
 ## `zotero_styles` — resolve CSL styles
 - `resolve` maps a human name ("APA 7th", "IEEE", "Vancouver", "Chicago", "MLA", "Nature", …) to a valid CSL id and confirms it can be fetched.
 - `list` returns the built-in common aliases. Any id from the [CSL styles repository](https://github.com/citation-style-language/styles) works too. Dependent styles are resolved to their independent parent automatically.

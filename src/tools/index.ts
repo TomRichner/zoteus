@@ -12,6 +12,7 @@ import manageTags from './manage-tags.js';
 import savedSearches from './saved-searches.js';
 import groups from './groups.js';
 import exportTool from './export.js';
+import citekeys from './citekeys.js';
 import fulltext from './fulltext.js';
 import getFulltext from './get-fulltext.js';
 import pdfImages from './pdf-images.js';
@@ -48,6 +49,7 @@ export const tools: AnyToolDefinition[] = [
   // Files / sync / groups / export (M4)
   groups,
   exportTool,
+  citekeys,
   fulltext,
   getFulltext,
   pdfImages,

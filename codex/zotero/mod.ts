@@ -11,6 +11,7 @@ export { manageTags } from './manageTags.js';
 export { savedSearches } from './savedSearches.js';
 export { groups } from './groups.js';
 export { exportTool } from './exportTool.js';
+export { citekeys } from './citekeys.js';
 export { fulltext } from './fulltext.js';
 export { getFulltext } from './getFulltext.js';
 export { pdfImages } from './pdfImages.js';

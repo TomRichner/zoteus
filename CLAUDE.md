@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Zoteus is an MCP server (TypeScript, Node >= 20.19, NodeNext ESM) that exposes a Zotero library to Claude, ChatGPT and other MCP clients as 31 `zotero_*` tools. Published to npm as `@oscardvs/zoteus`; `dist/index.js` is the `zoteus` binary.
+Zoteus is an MCP server (TypeScript, Node >= 20.19, NodeNext ESM) that exposes a Zotero library to Claude, ChatGPT and other MCP clients as 32 `zotero_*` tools. Published to npm as `@oscardvs/zoteus`; `dist/index.js` is the `zoteus` binary.
 
 ## Commands
 

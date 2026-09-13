@@ -7,6 +7,15 @@ All notable changes to Zoteus are documented here. The format is based on
 ## [Unreleased]
 
 ### Added
+- **`zotero_citekeys`: Better BibTeX citation keys in both directions.** `citekeys` says
+  which keys exist in the library and which item each one is, with that item's attachments
+  and their local file paths; `item_keys` returns each item's key. A manuscript that cites
+  with `[@key]` needs this before anything is exported, and the only route so far was
+  `zotero_export format:"better-biblatex"`, which needs the plugin reachable and hands back
+  formatted entries to parse. Better BibTeX fills Zotero's own `citationKey` field, which
+  quick search reaches, so the keys resolve over the ordinary read route: the desktop app
+  answers key-free, and the Web API answers for a synced library when the app is closed.
+  A hit is filtered to the exact key, since `q` also matches titles and creators.
 - **`zotero_attachment action:"info"` returns where the file is on this machine:** `localPath`
   and `localPathExists`, and `item_key` may name a parent item, which resolves to its best
   readable attachment. The path was always computable (the readers open
